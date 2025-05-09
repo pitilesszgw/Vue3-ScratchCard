@@ -12,7 +12,7 @@ import { ref, onMounted, onUnmounted, nextTick, defineEmits } from "vue";
 const props = defineProps({
   scratchPercent: {
     type: Number,
-    default: 80
+    default: 60
   },
   imageUrl: {
     type: String
@@ -41,6 +41,14 @@ const props = defineProps({
     type: Number,
     default: 10,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  defaultRemove: {
+    type: Boolean,
+    default: false,
+  }
 });
 const emit = defineEmits(['scratchStart', 'scratchEnd', 'scratchAll'])
 const ctx = ref<CanvasRenderingContext2D | null | undefined>(null);
@@ -51,9 +59,11 @@ const height = ref(0);
 const isScratching = ref(false);
 const init = () => {
   initCanvas();
+  
   nextTick(() => {
     initDraw();
     bindEvents();
+  //  canvas.value &&  canvas.value.remove();
   })
 };
 const initCanvas = () => {
@@ -94,6 +104,7 @@ const initDraw = () => {
     }
     ctx.value.fillRect(0, 0, width.value, height.value);
     //若没有图片绘制文本
+    console.log(props.imageUrl)
     if (!props.imageUrl) {
       // 文本
       ctx.value.fillStyle = props.fillStyle;
@@ -137,6 +148,7 @@ const bindEvents = () => {
   }
   // pc
   canvas.value.addEventListener("mousedown", (e) => {
+    if (props.disabled) return
     isScratching.value = true;
     drawArc(e);
   });
@@ -146,11 +158,13 @@ const bindEvents = () => {
     }
   });
   canvas.value.addEventListener("mouseup", () => {
+    if (props.disabled) return
     isScratching.value = false;
     calcArea();
   });
   // wap
   canvas.value.addEventListener("touchstart", (e) => {
+    if (props.disabled) return
     emit("scratchStart");
     isScratching.value = true;
     drawArc(e);
@@ -232,6 +246,7 @@ const onResize = () => {
 
 onMounted(() => {
   init();
+  
   window.addEventListener("resize", onResize);
 })
 onUnmounted(() => {
@@ -248,7 +263,7 @@ defineExpose({
     <div ref="slot" class="slot" :style="{ borderRadius: radius + 'px' }">
       <slot></slot>
     </div>
-    <canvas v-if="width && height" class="canvas" ref="canvas" :width="width" :height="height"></canvas>
+    <canvas v-if="width && height" class="canvas" ref="canvas" v-show="!defaultRemove" :width="width" :height="height"></canvas>
   </div>
 </template>
 
