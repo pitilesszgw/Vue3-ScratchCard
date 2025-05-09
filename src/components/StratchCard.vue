@@ -1,12 +1,3 @@
-<!--
- * @Descripttion: 
- * @version: 
- * @Author: Choicc
- * @Date: 2023-03-21 11:30:14
- * @LastEditors: Choicc
- * @LastEditTime: 2023-03-27 15:08:19
- * @email: ccyforworks@gmail.com
--->
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick, defineEmits } from "vue";
 const props = defineProps({
